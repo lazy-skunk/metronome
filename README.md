@@ -1,17 +1,3 @@
-# Tempo Keeper
+# Metronome
 
-テンポに合わせて音と光で拍を刻むメトロノーム Web アプリです。
-
-BPM（30〜240）と1小節の拍数（2〜6）を設定して、楽器の練習などに使えます。
-
-## 使う
-
-公開版は次のURLから使えます。
-
-<https://lazy-skunk.github.io/tempo-keeper/>
-
-## 使い方
-
-- 練習したいテンポと拍数を設定します。
-- 再生すると、音と光でリズムを確認できます。
-- 練習に合わせてテンポを調整しながら使えます。
+A web metronome app that marks the beat with sound and light.

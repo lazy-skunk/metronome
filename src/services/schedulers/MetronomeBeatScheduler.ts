@@ -1,12 +1,12 @@
-export type TempoKeeperBeatSchedulerClock = {
+export type MetronomeBeatSchedulerClock = {
   getCurrentTimeSeconds: () => number | null;
   getTargetPerformanceTimeMilliseconds: (playbackTimeSeconds: number) => number | null;
 };
 
-type TempoKeeperBeatSchedulerOptions = {
+type MetronomeBeatSchedulerOptions = {
   tempoBpm: number;
   beatsPerBar: number;
-  clock: TempoKeeperBeatSchedulerClock;
+  clock: MetronomeBeatSchedulerClock;
   lookaheadMilliseconds?: number;
   scheduleAheadSeconds?: number;
   onClockUnavailable?: () => void;
@@ -21,10 +21,10 @@ const LOOKAHEAD_MILLISECONDS = 25;
 const SCHEDULE_AHEAD_SECONDS = 0.1;
 const DOWNBEAT_INDEX = 0;
 
-export class TempoKeeperBeatScheduler {
+export class MetronomeBeatScheduler {
   private schedulerIntervalId: ReturnType<typeof setInterval> | null = null;
 
-  private readonly clock: TempoKeeperBeatSchedulerClock;
+  private readonly clock: MetronomeBeatSchedulerClock;
   private readonly lookaheadMilliseconds: number;
   private readonly scheduleAheadSeconds: number;
   private readonly onClockUnavailable?: () => void;
@@ -39,7 +39,7 @@ export class TempoKeeperBeatScheduler {
   private currentBeatIndex = DOWNBEAT_INDEX;
   private nextBeatTimeSeconds = 0;
 
-  constructor(options: TempoKeeperBeatSchedulerOptions) {
+  constructor(options: MetronomeBeatSchedulerOptions) {
     this.tempoBpm = options.tempoBpm;
     this.beatsPerBar = options.beatsPerBar;
     this.clock = options.clock;

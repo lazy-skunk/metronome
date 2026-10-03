@@ -17,7 +17,7 @@ const resolveAudioContextConstructor = () => {
   );
 };
 
-export class TempoKeeperAudioEngine {
+export class MetronomeAudioEngine {
   private audioContext: AudioContext | null = null;
   private scheduledOscillators = new Set<OscillatorNode>();
 
@@ -118,7 +118,7 @@ export class TempoKeeperAudioEngine {
       } catch (error) {
         if (import.meta.env.DEV) {
           console.debug(
-            "TempoKeeperAudioEngine: oscillator stop skipped (already ended or not stoppable).",
+            "MetronomeAudioEngine: oscillator stop skipped (already ended or not stoppable).",
             error,
           );
         }

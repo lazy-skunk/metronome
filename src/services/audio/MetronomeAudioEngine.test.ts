@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { describe, it, expect, beforeEach, vi } from "vite-plus/test";
-import { TempoKeeperAudioEngine } from "./TempoKeeperAudioEngine";
+import { MetronomeAudioEngine } from "./MetronomeAudioEngine";
 
 class FakeAudioParam {
   public readonly setValueAtTimeCalls: Array<[number, number]> = [];
@@ -60,7 +60,7 @@ class FakeAudioContext {
   }
 }
 
-describe("TempoKeeperAudioEngine", () => {
+describe("MetronomeAudioEngine", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
   });
@@ -75,7 +75,7 @@ describe("TempoKeeperAudioEngine", () => {
       value: AudioContextMock,
     });
 
-    const engine = new TempoKeeperAudioEngine();
+    const engine = new MetronomeAudioEngine();
     const preparedContext = await engine.prepare();
 
     expect(AudioContextMock).toHaveBeenCalledTimes(1);
@@ -95,7 +95,7 @@ describe("TempoKeeperAudioEngine", () => {
       value: AudioContextMock,
     });
 
-    const engine = new TempoKeeperAudioEngine();
+    const engine = new MetronomeAudioEngine();
     await engine.prepare();
     engine.scheduleClickSound(10, 0);
 
@@ -121,7 +121,7 @@ describe("TempoKeeperAudioEngine", () => {
       value: AudioContextMock,
     });
 
-    const engine = new TempoKeeperAudioEngine();
+    const engine = new MetronomeAudioEngine();
     await engine.prepare();
     engine.scheduleClickSound(10, 0);
     engine.scheduleClickSound(11, 1);
@@ -145,7 +145,7 @@ describe("TempoKeeperAudioEngine", () => {
       value: AudioContextMock,
     });
 
-    const engine = new TempoKeeperAudioEngine();
+    const engine = new MetronomeAudioEngine();
     await engine.prepare();
     await engine.dispose();
 

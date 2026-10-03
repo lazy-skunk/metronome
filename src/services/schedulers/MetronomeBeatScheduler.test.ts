@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 import { describe, it, expect, beforeEach, afterEach, vi } from "vite-plus/test";
-import { TempoKeeperBeatScheduler } from "./TempoKeeperBeatScheduler";
+import { MetronomeBeatScheduler } from "./MetronomeBeatScheduler";
 
-describe("TempoKeeperBeatScheduler", () => {
+describe("MetronomeBeatScheduler", () => {
   let currentTimeSeconds: number;
 
   beforeEach(() => {
@@ -16,7 +16,7 @@ describe("TempoKeeperBeatScheduler", () => {
 
   it("starts playback and schedules beats against the provided clock", () => {
     const onBeatScheduled = vi.fn();
-    const scheduler = new TempoKeeperBeatScheduler({
+    const scheduler = new MetronomeBeatScheduler({
       tempoBpm: 120,
       beatsPerBar: 4,
       clock: {
@@ -42,7 +42,7 @@ describe("TempoKeeperBeatScheduler", () => {
 
   it("stops playback when the active clock becomes unavailable", () => {
     const onClockUnavailable = vi.fn();
-    const scheduler = new TempoKeeperBeatScheduler({
+    const scheduler = new MetronomeBeatScheduler({
       tempoBpm: 120,
       beatsPerBar: 4,
       clock: {
@@ -62,7 +62,7 @@ describe("TempoKeeperBeatScheduler", () => {
   it("reports failure when the first beat has no display time", () => {
     const onClockUnavailable = vi.fn();
     const onBeatScheduled = vi.fn();
-    const scheduler = new TempoKeeperBeatScheduler({
+    const scheduler = new MetronomeBeatScheduler({
       tempoBpm: 120,
       beatsPerBar: 4,
       clock: {
@@ -80,7 +80,7 @@ describe("TempoKeeperBeatScheduler", () => {
   });
   it("uses supplied settings and restarts from the downbeat without duplicate timers", () => {
     const onBeatScheduled = vi.fn();
-    const scheduler = new TempoKeeperBeatScheduler({
+    const scheduler = new MetronomeBeatScheduler({
       tempoBpm: 60,
       beatsPerBar: 3,
       clock: {

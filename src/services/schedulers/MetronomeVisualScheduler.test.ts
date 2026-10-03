@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 import { describe, it, expect, beforeEach, afterEach, vi } from "vite-plus/test";
-import { TempoKeeperVisualScheduler } from "./TempoKeeperVisualScheduler";
+import { MetronomeVisualScheduler } from "./MetronomeVisualScheduler";
 
-describe("TempoKeeperVisualScheduler", () => {
+describe("MetronomeVisualScheduler", () => {
   beforeEach(() => {
     vi.useFakeTimers();
     vi.spyOn(performance, "now").mockReturnValue(100);
@@ -24,7 +24,7 @@ describe("TempoKeeperVisualScheduler", () => {
         return 1;
       });
     const onBeatActivated = vi.fn();
-    const scheduler = new TempoKeeperVisualScheduler({ onBeatActivated });
+    const scheduler = new MetronomeVisualScheduler({ onBeatActivated });
 
     scheduler.scheduleBeat(2, 110);
 
@@ -50,7 +50,7 @@ describe("TempoKeeperVisualScheduler", () => {
       .spyOn(window, "requestAnimationFrame")
       .mockImplementation(() => 7);
     const onBeatActivated = vi.fn();
-    const scheduler = new TempoKeeperVisualScheduler({ onBeatActivated });
+    const scheduler = new MetronomeVisualScheduler({ onBeatActivated });
 
     scheduler.scheduleBeat(1, 120);
     scheduler.clear();
@@ -70,7 +70,7 @@ describe("TempoKeeperVisualScheduler", () => {
       });
     const cancelFrame = vi.spyOn(window, "cancelAnimationFrame");
     const onBeatActivated = vi.fn();
-    const scheduler = new TempoKeeperVisualScheduler({ onBeatActivated });
+    const scheduler = new MetronomeVisualScheduler({ onBeatActivated });
 
     scheduler.scheduleBeat(1, 120);
     vi.advanceTimersByTime(20);

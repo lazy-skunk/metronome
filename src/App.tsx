@@ -1,5 +1,9 @@
-import TempoKeeper from "./components/TempoKeeper";
+import Metronome from "./components/Metronome";
 
 export function App() {
-  return <TempoKeeper />;
+  return (
+    <main>
+      <Metronome />
+    </main>
+  );
 }

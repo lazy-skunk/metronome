@@ -1,9 +1,9 @@
 // @vitest-environment jsdom
 import { describe, it, expect, beforeEach, afterEach, vi, type MockInstance } from "vite-plus/test";
 import { act, cleanup, renderHook } from "@testing-library/react";
-import { useTempoKeeper, INITIAL_TEMPO_KEEPER_PLAYBACK_STATE } from "./useTempoKeeper";
-import { TempoKeeperAudioEngine } from "../services/audio/TempoKeeperAudioEngine";
-import { TempoKeeperVisualScheduler } from "../services/schedulers/TempoKeeperVisualScheduler";
+import { useMetronome, INITIAL_METRONOME_PLAYBACK_STATE } from "./useMetronome";
+import { MetronomeAudioEngine } from "../services/audio/MetronomeAudioEngine";
+import { MetronomeVisualScheduler } from "../services/schedulers/MetronomeVisualScheduler";
 
 const audioContext = {
   currentTime: 100,
@@ -20,25 +20,25 @@ function createAudioPreparation() {
   return { promise, resolve, reject };
 }
 
-describe("useTempoKeeper", () => {
-  let prepare: MockInstance<TempoKeeperAudioEngine["prepare"]>;
-  let getAudioContext: MockInstance<TempoKeeperAudioEngine["getAudioContext"]>;
-  let scheduleClickSound: MockInstance<TempoKeeperAudioEngine["scheduleClickSound"]>;
-  let stopAudio: MockInstance<TempoKeeperAudioEngine["stop"]>;
-  let scheduleBeat: MockInstance<TempoKeeperVisualScheduler["scheduleBeat"]>;
-  let clearVisuals: MockInstance<TempoKeeperVisualScheduler["clear"]>;
+describe("useMetronome", () => {
+  let prepare: MockInstance<MetronomeAudioEngine["prepare"]>;
+  let getAudioContext: MockInstance<MetronomeAudioEngine["getAudioContext"]>;
+  let scheduleClickSound: MockInstance<MetronomeAudioEngine["scheduleClickSound"]>;
+  let stopAudio: MockInstance<MetronomeAudioEngine["stop"]>;
+  let scheduleBeat: MockInstance<MetronomeVisualScheduler["scheduleBeat"]>;
+  let clearVisuals: MockInstance<MetronomeVisualScheduler["clear"]>;
   beforeEach(() => {
     vi.useFakeTimers();
-    prepare = vi.spyOn(TempoKeeperAudioEngine.prototype, "prepare").mockResolvedValue(audioContext);
+    prepare = vi.spyOn(MetronomeAudioEngine.prototype, "prepare").mockResolvedValue(audioContext);
     getAudioContext = vi
-      .spyOn(TempoKeeperAudioEngine.prototype, "getAudioContext")
+      .spyOn(MetronomeAudioEngine.prototype, "getAudioContext")
       .mockReturnValue(audioContext);
     scheduleClickSound = vi
-      .spyOn(TempoKeeperAudioEngine.prototype, "scheduleClickSound")
+      .spyOn(MetronomeAudioEngine.prototype, "scheduleClickSound")
       .mockImplementation(() => {});
-    stopAudio = vi.spyOn(TempoKeeperAudioEngine.prototype, "stop");
-    scheduleBeat = vi.spyOn(TempoKeeperVisualScheduler.prototype, "scheduleBeat");
-    clearVisuals = vi.spyOn(TempoKeeperVisualScheduler.prototype, "clear");
+    stopAudio = vi.spyOn(MetronomeAudioEngine.prototype, "stop");
+    scheduleBeat = vi.spyOn(MetronomeVisualScheduler.prototype, "scheduleBeat");
+    clearVisuals = vi.spyOn(MetronomeVisualScheduler.prototype, "clear");
   });
 
   afterEach(() => {
@@ -48,8 +48,8 @@ describe("useTempoKeeper", () => {
   });
 
   it("starts idle and updates settings", () => {
-    const { result } = renderHook(useTempoKeeper);
-    expect(result.current.playbackState).toEqual(INITIAL_TEMPO_KEEPER_PLAYBACK_STATE);
+    const { result } = renderHook(useMetronome);
+    expect(result.current.playbackState).toEqual(INITIAL_METRONOME_PLAYBACK_STATE);
     act(() => {
       result.current.setTempoBpm(144);
       result.current.setBeatsPerBar(3);
@@ -63,7 +63,7 @@ describe("useTempoKeeper", () => {
   });
 
   it("starts real scheduling and clears audio and visuals on stop", async () => {
-    const { result } = renderHook(useTempoKeeper);
+    const { result } = renderHook(useMetronome);
     await act(async () => {
       expect(await result.current.startPlayback()).toBe(true);
     });
@@ -80,7 +80,7 @@ describe("useTempoKeeper", () => {
   it("ignores repeated starts while preparing without displaying an error", async () => {
     const preparation = createAudioPreparation();
     prepare.mockReturnValue(preparation.promise);
-    const { result } = renderHook(useTempoKeeper);
+    const { result } = renderHook(useMetronome);
     let start!: Promise<boolean>;
     act(() => {
       start = result.current.startPlayback();
@@ -106,7 +106,7 @@ describe("useTempoKeeper", () => {
       prepare
         .mockReturnValueOnce(oldPreparation.promise)
         .mockReturnValueOnce(newPreparation.promise);
-      const { result } = renderHook(useTempoKeeper);
+      const { result } = renderHook(useMetronome);
       let oldStart!: Promise<boolean>;
       let newStart!: Promise<boolean>;
       act(() => {
@@ -134,7 +134,7 @@ describe("useTempoKeeper", () => {
   it("does not schedule playback after unmount during preparation", async () => {
     const preparation = createAudioPreparation();
     prepare.mockReturnValue(preparation.promise);
-    const { result, unmount } = renderHook(useTempoKeeper);
+    const { result, unmount } = renderHook(useMetronome);
     let start!: Promise<boolean>;
     act(() => {
       start = result.current.startPlayback();
@@ -151,7 +151,7 @@ describe("useTempoKeeper", () => {
     async (failure) => {
       if (failure === "unavailable") prepare.mockResolvedValueOnce(null);
       else prepare.mockRejectedValueOnce(new Error("Audio setup failed"));
-      const { result } = renderHook(useTempoKeeper);
+      const { result } = renderHook(useMetronome);
       await act(async () => {
         expect(await result.current.startPlayback()).toBe(false);
       });
@@ -168,7 +168,7 @@ describe("useTempoKeeper", () => {
   it("stays idle when the first beat cannot read the clock", async () => {
     vi.spyOn(console, "warn").mockImplementation(() => {});
     getAudioContext.mockReturnValue(null);
-    const { result } = renderHook(useTempoKeeper);
+    const { result } = renderHook(useMetronome);
     await act(async () => {
       expect(await result.current.startPlayback()).toBe(false);
     });
@@ -181,7 +181,7 @@ describe("useTempoKeeper", () => {
 
   it("stops and clears scheduled output when the running clock is lost", async () => {
     vi.spyOn(console, "warn").mockImplementation(() => {});
-    const { result } = renderHook(useTempoKeeper);
+    const { result } = renderHook(useMetronome);
     await act(async () => {
       await result.current.startPlayback();
     });
@@ -196,7 +196,7 @@ describe("useTempoKeeper", () => {
   });
 
   it("preserves unfinished tempo input and clamps it on commit", () => {
-    const { result } = renderHook(useTempoKeeper);
+    const { result } = renderHook(useMetronome);
     act(() => result.current.setTempoInputValue("2"));
     expect(result.current.tempoInputValue).toBe("2");
     expect(result.current.playbackState.tempoBpm).toBe(120);
@@ -209,7 +209,7 @@ describe("useTempoKeeper", () => {
   it("does not let an old failure stop a newer playback", async () => {
     const oldPreparation = createAudioPreparation();
     prepare.mockReturnValueOnce(oldPreparation.promise);
-    const { result } = renderHook(useTempoKeeper);
+    const { result } = renderHook(useMetronome);
     let oldStart!: Promise<boolean>;
     act(() => {
       oldStart = result.current.startPlayback();

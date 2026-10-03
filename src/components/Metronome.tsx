@@ -1,4 +1,4 @@
-import { TEMPO_BPM_RANGE, useTempoKeeper } from "../hooks/useTempoKeeper";
+import { TEMPO_BPM_RANGE, useMetronome } from "../hooks/useMetronome";
 const BEATS_PER_BAR_OPTIONS = [2, 3, 4, 5, 6] as const;
 const DOWNBEAT_INDEX = 0;
 const TEMPO_COLOR_MIN_BPM = 60;
@@ -6,7 +6,7 @@ const TEMPO_COLOR_MAX_BPM = 210;
 const HSL_RED_HUE = 0;
 const HSL_GREEN_HUE = 120;
 
-export default function TempoKeeper() {
+export default function Metronome() {
   const {
     playbackState,
     tempoInputValue,
@@ -17,7 +17,7 @@ export default function TempoKeeper() {
     commitTempoInput,
     startPlayback,
     stopPlayback,
-  } = useTempoKeeper();
+  } = useMetronome();
   const { tempoBpm, beatsPerBar, status, activeBeatIndex } = playbackState;
 
   const tempoProgress = Math.min(
@@ -41,7 +41,7 @@ export default function TempoKeeper() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center mx-9">
-      <h1 className="mb-3 text-center text-3xl font-bold">Tempo Keeper</h1>
+      <h1 className="mb-3 text-center text-3xl font-bold">Metronome</h1>
 
       <div className="flex w-full flex-col rounded border p-6">
         <div className="flex flex-col items-center justify-center gap-3">

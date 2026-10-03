@@ -1,6 +1,6 @@
-import { TempoKeeperAudioEngine } from "../services/audio/TempoKeeperAudioEngine";
-import { TempoKeeperBeatScheduler } from "../services/schedulers/TempoKeeperBeatScheduler";
-import { TempoKeeperVisualScheduler } from "../services/schedulers/TempoKeeperVisualScheduler";
+import { MetronomeAudioEngine } from "../services/audio/MetronomeAudioEngine";
+import { MetronomeBeatScheduler } from "../services/schedulers/MetronomeBeatScheduler";
+import { MetronomeVisualScheduler } from "../services/schedulers/MetronomeVisualScheduler";
 import { useEffect, useRef, useState } from "react";
 
 export const TEMPO_BPM_RANGE = {
@@ -9,38 +9,38 @@ export const TEMPO_BPM_RANGE = {
 } as const;
 
 const MIN_BEATS_PER_BAR = 1;
-export const INITIAL_TEMPO_KEEPER_PLAYBACK_STATE = {
+export const INITIAL_METRONOME_PLAYBACK_STATE = {
   tempoBpm: 120,
   beatsPerBar: 4,
   status: "idle",
   activeBeatIndex: 0,
-} as const satisfies TempoKeeperPlaybackState;
+} as const satisfies MetronomePlaybackState;
 
-export type TempoKeeperPlaybackState = {
+export type MetronomePlaybackState = {
   tempoBpm: number;
   beatsPerBar: number;
   status: "idle" | "starting" | "running";
   activeBeatIndex: number;
 };
 
-export const useTempoKeeper = () => {
-  const [playbackState, setPlaybackState] = useState<TempoKeeperPlaybackState>({
-    ...INITIAL_TEMPO_KEEPER_PLAYBACK_STATE,
+export const useMetronome = () => {
+  const [playbackState, setPlaybackState] = useState<MetronomePlaybackState>({
+    ...INITIAL_METRONOME_PLAYBACK_STATE,
   });
   const [tempoInputValue, setTempoInputValue] = useState(
-    String(INITIAL_TEMPO_KEEPER_PLAYBACK_STATE.tempoBpm),
+    String(INITIAL_METRONOME_PLAYBACK_STATE.tempoBpm),
   );
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const audioEngineRef = useRef<TempoKeeperAudioEngine | null>(null);
-  const beatSchedulerRef = useRef<TempoKeeperBeatScheduler | null>(null);
-  const visualSchedulerRef = useRef<TempoKeeperVisualScheduler | null>(null);
+  const audioEngineRef = useRef<MetronomeAudioEngine | null>(null);
+  const beatSchedulerRef = useRef<MetronomeBeatScheduler | null>(null);
+  const visualSchedulerRef = useRef<MetronomeVisualScheduler | null>(null);
   // Stop and unmount invalidate the pending start so its result cannot update the UI.
   const pendingStartRef = useRef<{ cancelled: boolean } | null>(null);
 
   useEffect(() => {
-    const audioEngine = new TempoKeeperAudioEngine();
-    const visualScheduler = new TempoKeeperVisualScheduler({
+    const audioEngine = new MetronomeAudioEngine();
+    const visualScheduler = new MetronomeVisualScheduler({
       onBeatActivated: (beatIndex) => {
         setPlaybackState((previousState) => ({
           ...previousState,
@@ -48,9 +48,9 @@ export const useTempoKeeper = () => {
         }));
       },
     });
-    const beatScheduler = new TempoKeeperBeatScheduler({
-      tempoBpm: INITIAL_TEMPO_KEEPER_PLAYBACK_STATE.tempoBpm,
-      beatsPerBar: INITIAL_TEMPO_KEEPER_PLAYBACK_STATE.beatsPerBar,
+    const beatScheduler = new MetronomeBeatScheduler({
+      tempoBpm: INITIAL_METRONOME_PLAYBACK_STATE.tempoBpm,
+      beatsPerBar: INITIAL_METRONOME_PLAYBACK_STATE.beatsPerBar,
       clock: {
         getCurrentTimeSeconds: () => audioEngine.getAudioContext()?.currentTime ?? null,
         getTargetPerformanceTimeMilliseconds: (playbackTimeSeconds) =>
@@ -65,12 +65,12 @@ export const useTempoKeeper = () => {
         visualScheduler.clear();
         setPlaybackState((previousState) => ({
           ...previousState,
-          activeBeatIndex: INITIAL_TEMPO_KEEPER_PLAYBACK_STATE.activeBeatIndex,
+          activeBeatIndex: INITIAL_METRONOME_PLAYBACK_STATE.activeBeatIndex,
           status: "idle",
         }));
         setErrorMessage("Playback stopped unexpectedly. Please start again.");
         if (import.meta.env.DEV) {
-          console.warn("useTempoKeeper: active clock became unavailable, playback stopped.");
+          console.warn("useMetronome: active clock became unavailable, playback stopped.");
         }
       },
       onBeatScheduled: (
@@ -126,7 +126,7 @@ export const useTempoKeeper = () => {
     setPlaybackState((previousState) => ({
       ...previousState,
       beatsPerBar: candidateBeatsPerBar,
-      activeBeatIndex: INITIAL_TEMPO_KEEPER_PLAYBACK_STATE.activeBeatIndex,
+      activeBeatIndex: INITIAL_METRONOME_PLAYBACK_STATE.activeBeatIndex,
     }));
     beatSchedulerRef.current?.setBeatsPerBar(candidateBeatsPerBar);
   }
@@ -174,7 +174,7 @@ export const useTempoKeeper = () => {
     setPlaybackState((previousState) => ({
       ...previousState,
       status: didStart ? "running" : "idle",
-      activeBeatIndex: INITIAL_TEMPO_KEEPER_PLAYBACK_STATE.activeBeatIndex,
+      activeBeatIndex: INITIAL_METRONOME_PLAYBACK_STATE.activeBeatIndex,
     }));
     return didStart;
   }
@@ -190,7 +190,7 @@ export const useTempoKeeper = () => {
     setErrorMessage(null);
     setPlaybackState((previousState) => ({
       ...previousState,
-      activeBeatIndex: INITIAL_TEMPO_KEEPER_PLAYBACK_STATE.activeBeatIndex,
+      activeBeatIndex: INITIAL_METRONOME_PLAYBACK_STATE.activeBeatIndex,
       status: "idle",
     }));
   }

@@ -1,14 +1,14 @@
-type TempoKeeperVisualSchedulerOptions = {
+type MetronomeVisualSchedulerOptions = {
   onBeatActivated: (beatIndex: number) => void;
 };
 
-export class TempoKeeperVisualScheduler {
+export class MetronomeVisualScheduler {
   private scheduledBeatTimeoutIds = new Set<number>();
   private scheduledBeatAnimationFrameIds = new Set<number>();
 
   private readonly onBeatActivated: (beatIndex: number) => void;
 
-  constructor(options: TempoKeeperVisualSchedulerOptions) {
+  constructor(options: MetronomeVisualSchedulerOptions) {
     this.onBeatActivated = options.onBeatActivated;
   }
 
