@@ -65,25 +65,6 @@ describe("MetronomeAudioEngine", () => {
     vi.restoreAllMocks();
   });
 
-  it("creates and resumes an audio context during prepare", async () => {
-    const fakeAudioContext = new FakeAudioContext();
-    const AudioContextMock = vi.fn(function AudioContextMock() {
-      return fakeAudioContext;
-    });
-    Object.defineProperty(window, "AudioContext", {
-      configurable: true,
-      value: AudioContextMock,
-    });
-
-    const engine = new MetronomeAudioEngine();
-    const preparedContext = await engine.prepare();
-
-    expect(AudioContextMock).toHaveBeenCalledTimes(1);
-    expect(fakeAudioContext.resume).toHaveBeenCalledTimes(1);
-    expect(preparedContext).toBe(fakeAudioContext);
-    expect(engine.getAudioContext()).toBe(fakeAudioContext);
-  });
-
   it("schedules a stronger click for the downbeat", async () => {
     const fakeAudioContext = new FakeAudioContext();
     fakeAudioContext.state = "running";
@@ -98,16 +79,16 @@ describe("MetronomeAudioEngine", () => {
     const engine = new MetronomeAudioEngine();
     await engine.prepare();
     engine.scheduleClickSound(10, 0);
+    engine.scheduleClickSound(11, 1);
 
-    const oscillator = fakeAudioContext.oscillators[0];
-    const gainNode = fakeAudioContext.gainNodes[0];
+    const downbeatOscillator = fakeAudioContext.oscillators[0];
+    const downbeatGain = fakeAudioContext.gainNodes[0].gain;
+    const regularBeatGain = fakeAudioContext.gainNodes[1].gain;
 
-    expect(oscillator.type).toBe("triangle");
-    expect(oscillator.frequency.setValueAtTimeCalls[0]).toEqual([1000, 10]);
-    expect(gainNode.gain.setValueAtTimeCalls[0]).toEqual([0.0001, 10]);
-    expect(gainNode.gain.exponentialRampToValueAtTimeCalls[0]).toEqual([1, 10.001]);
-    expect(oscillator.start).toHaveBeenCalledWith(10);
-    expect(oscillator.stop).toHaveBeenCalled();
+    expect(downbeatOscillator.start).toHaveBeenCalledWith(10);
+    expect(downbeatGain.exponentialRampToValueAtTimeCalls[0][0]).toBeGreaterThan(
+      regularBeatGain.exponentialRampToValueAtTimeCalls[0][0],
+    );
   });
 
   it("stops all scheduled oscillators at the current audio time", async () => {

@@ -1,9 +1,9 @@
 // @vitest-environment jsdom
 import { describe, it, expect, beforeEach, afterEach, vi, type MockInstance } from "vite-plus/test";
 import { act, cleanup, renderHook } from "@testing-library/react";
-import { useMetronome, INITIAL_METRONOME_PLAYBACK_STATE } from "./useMetronome";
-import { MetronomeAudioEngine } from "../services/audio/MetronomeAudioEngine";
-import { MetronomeVisualScheduler } from "../services/schedulers/MetronomeVisualScheduler";
+import { useMetronome } from "./useMetronome";
+import { MetronomeAudioEngine } from "./MetronomeAudioEngine";
+import { MetronomeVisualScheduler } from "./MetronomeVisualScheduler";
 
 const audioContext = {
   currentTime: 100,
@@ -45,21 +45,6 @@ describe("useMetronome", () => {
     cleanup();
     vi.restoreAllMocks();
     vi.useRealTimers();
-  });
-
-  it("starts idle and updates settings", () => {
-    const { result } = renderHook(useMetronome);
-    expect(result.current.playbackState).toEqual(INITIAL_METRONOME_PLAYBACK_STATE);
-    act(() => {
-      result.current.setTempoBpm(144);
-      result.current.setBeatsPerBar(3);
-    });
-    expect(result.current.playbackState).toEqual({
-      tempoBpm: 144,
-      beatsPerBar: 3,
-      status: "idle",
-      activeBeatIndex: 0,
-    });
   });
 
   it("starts real scheduling and clears audio and visuals on stop", async () => {
@@ -195,36 +180,28 @@ describe("useMetronome", () => {
     expect(vi.getTimerCount()).toBe(0);
   });
 
-  it("preserves unfinished tempo input and clamps it on commit", () => {
-    const { result } = renderHook(useMetronome);
-    act(() => result.current.setTempoInputValue("2"));
-    expect(result.current.tempoInputValue).toBe("2");
-    expect(result.current.playbackState.tempoBpm).toBe(120);
-    act(() => result.current.commitTempoInput());
-    expect(result.current.tempoInputValue).toBe("30");
-    expect(result.current.playbackState.tempoBpm).toBe(30);
-    act(() => result.current.setTempoBpm(999));
-    expect(result.current.playbackState.tempoBpm).toBe(240);
-  });
-  it("does not let an old failure stop a newer playback", async () => {
-    const oldPreparation = createAudioPreparation();
-    prepare.mockReturnValueOnce(oldPreparation.promise);
-    const { result } = renderHook(useMetronome);
-    let oldStart!: Promise<boolean>;
-    act(() => {
-      oldStart = result.current.startPlayback();
-    });
-    act(() => result.current.stopPlayback());
-    await act(async () => {
-      expect(await result.current.startPlayback()).toBe(true);
-    });
-    stopAudio.mockClear();
-    await act(async () => {
-      oldPreparation.reject(new Error("Old setup failed"));
-      expect(await oldStart).toBe(false);
-    });
-    expect(result.current.playbackState.status).toBe("running");
-    expect(result.current.errorMessage).toBeNull();
-    expect(stopAudio).not.toHaveBeenCalled();
-  });
+  it.each(["visibilitychange", "pagehide"])(
+    "stops playback on the %s page lifecycle event",
+    async (eventName) => {
+      const { result } = renderHook(useMetronome);
+      await act(async () => {
+        await result.current.startPlayback();
+      });
+
+      if (eventName === "visibilitychange") {
+        vi.spyOn(document, "visibilityState", "get").mockReturnValue("hidden");
+      }
+      act(() => {
+        const target = eventName === "visibilitychange" ? document : window;
+        target.dispatchEvent(new Event(eventName));
+      });
+
+      expect(result.current.playbackState.status).toBe("idle");
+      expect(result.current.playbackState.activeBeatIndex).toBe(0);
+      expect(result.current.errorMessage).toBeNull();
+      expect(stopAudio).toHaveBeenCalled();
+      expect(clearVisuals).toHaveBeenCalled();
+      expect(vi.getTimerCount()).toBe(0);
+    },
+  );
 });

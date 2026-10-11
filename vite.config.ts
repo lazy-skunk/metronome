@@ -3,7 +3,7 @@ import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vite-plus";
 
 export default defineConfig({
-  base: process.env.GITHUB_PAGES === "true" ? "/tempo-keeper/" : "/",
+  base: process.env.GITHUB_PAGES === "true" ? "/metronome/" : "/",
   plugins: [react(), tailwindcss()],
   server: {
     watch: {

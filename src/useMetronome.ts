@@ -1,6 +1,6 @@
-import { MetronomeAudioEngine } from "../services/audio/MetronomeAudioEngine";
-import { MetronomeBeatScheduler } from "../services/schedulers/MetronomeBeatScheduler";
-import { MetronomeVisualScheduler } from "../services/schedulers/MetronomeVisualScheduler";
+import { MetronomeAudioEngine } from "./MetronomeAudioEngine";
+import { MetronomeBeatScheduler } from "./MetronomeBeatScheduler";
+import { MetronomeVisualScheduler } from "./MetronomeVisualScheduler";
 import { useEffect, useRef, useState } from "react";
 
 export const TEMPO_BPM_RANGE = {
@@ -86,7 +86,33 @@ export const useMetronome = () => {
     beatSchedulerRef.current = beatScheduler;
     visualSchedulerRef.current = visualScheduler;
 
+    const stopPlaybackForPageLifecycle = () => {
+      audioEngine.stop();
+      beatScheduler.stop();
+      visualScheduler.clear();
+      if (pendingStartRef.current) {
+        pendingStartRef.current.cancelled = true;
+      }
+      pendingStartRef.current = null;
+      setErrorMessage(null);
+      setPlaybackState((previousState) => ({
+        ...previousState,
+        activeBeatIndex: INITIAL_METRONOME_PLAYBACK_STATE.activeBeatIndex,
+        status: "idle",
+      }));
+    };
+    const stopPlaybackWhenHidden = () => {
+      if (document.visibilityState === "hidden") {
+        stopPlaybackForPageLifecycle();
+      }
+    };
+
+    document.addEventListener("visibilitychange", stopPlaybackWhenHidden);
+    window.addEventListener("pagehide", stopPlaybackForPageLifecycle);
+
     return () => {
+      document.removeEventListener("visibilitychange", stopPlaybackWhenHidden);
+      window.removeEventListener("pagehide", stopPlaybackForPageLifecycle);
       visualScheduler.clear();
       beatScheduler.stop();
       beatSchedulerRef.current = null;
