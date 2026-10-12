@@ -1,3 +1,4 @@
+const MILLISECONDS_PER_SECOND = 1000;
 const CLICK_FREQUENCY_HZ = 1000;
 const DOWNBEAT_INDEX = 0;
 const DOWNBEAT_CLICK_ATTACK_GAIN = 1.0;
@@ -43,11 +44,13 @@ export class MetronomeAudioEngine {
       const { contextTime, performanceTime } = outputTimestamp;
 
       if (typeof contextTime === "number" && typeof performanceTime === "number") {
-        return performanceTime + (playbackTimeSeconds - contextTime) * 1000;
+        return performanceTime + (playbackTimeSeconds - contextTime) * MILLISECONDS_PER_SECOND;
       }
     }
 
-    return performance.now() + (playbackTimeSeconds - audioContext.currentTime) * 1000;
+    return (
+      performance.now() + (playbackTimeSeconds - audioContext.currentTime) * MILLISECONDS_PER_SECOND
+    );
   }
 
   public async prepare() {

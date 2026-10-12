@@ -7,7 +7,7 @@ import { MetronomeVisualScheduler } from "./MetronomeVisualScheduler";
 
 const audioContext = {
   currentTime: 100,
-  getOutputTimestamp: () => ({ contextTime: 100, performanceTime: 100_000 }),
+  getOutputTimestamp: () => ({ contextTime: 100, performanceTime: 100000 }),
 } as AudioContext;
 
 function createAudioPreparation() {
@@ -54,7 +54,7 @@ describe("useMetronome", () => {
     });
     expect(result.current.playbackState.status).toBe("running");
     expect(scheduleClickSound).toHaveBeenCalledWith(100, 0);
-    expect(scheduleBeat).toHaveBeenCalledWith(0, 100_000);
+    expect(scheduleBeat).toHaveBeenCalledWith(0, 100000);
     act(() => result.current.stopPlayback());
     expect(result.current.playbackState.status).toBe("idle");
     expect(stopAudio).toHaveBeenCalled();

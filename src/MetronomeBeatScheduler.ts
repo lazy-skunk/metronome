@@ -20,6 +20,7 @@ type MetronomeBeatSchedulerOptions = {
 const LOOKAHEAD_MILLISECONDS = 25;
 const SCHEDULE_AHEAD_SECONDS = 0.1;
 const DOWNBEAT_INDEX = 0;
+const SECONDS_PER_MINUTE = 60;
 
 export class MetronomeBeatScheduler {
   private schedulerIntervalId: ReturnType<typeof setInterval> | null = null;
@@ -114,7 +115,7 @@ export class MetronomeBeatScheduler {
         targetPerformanceTimeMilliseconds,
       );
 
-      const secondsPerBeat = 60 / this.tempoBpm;
+      const secondsPerBeat = SECONDS_PER_MINUTE / this.tempoBpm;
       this.nextBeatTimeSeconds += secondsPerBeat;
       this.currentBeatIndex = (beatIndexToSchedule + 1) % this.beatsPerBar;
     }
