@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 import { describe, it, expect, beforeEach, afterEach, vi } from "vite-plus/test";
+
 import { MetronomeVisualScheduler } from "./MetronomeVisualScheduler";
 
 describe("MetronomeVisualScheduler", () => {

@@ -1,7 +1,8 @@
+import { useEffect, useRef, useState } from "react";
+
 import { MetronomeAudioEngine } from "./MetronomeAudioEngine";
 import { MetronomeBeatScheduler } from "./MetronomeBeatScheduler";
 import { MetronomeVisualScheduler } from "./MetronomeVisualScheduler";
-import { useEffect, useRef, useState } from "react";
 
 export const TEMPO_BPM_RANGE = {
   min: 30,

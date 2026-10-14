@@ -1,9 +1,10 @@
 // @vitest-environment jsdom
-import { describe, it, expect, beforeEach, afterEach, vi, type MockInstance } from "vite-plus/test";
 import { act, cleanup, renderHook } from "@testing-library/react";
-import { useMetronome } from "./useMetronome";
+import { describe, it, expect, beforeEach, afterEach, vi, type MockInstance } from "vite-plus/test";
+
 import { MetronomeAudioEngine } from "./MetronomeAudioEngine";
 import { MetronomeVisualScheduler } from "./MetronomeVisualScheduler";
+import { useMetronome } from "./useMetronome";
 
 const audioContext = {
   currentTime: 100,
