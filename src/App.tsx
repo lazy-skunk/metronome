@@ -48,7 +48,7 @@ export function App() {
   return (
     <div className="bg-background text-foreground flex min-h-screen flex-col items-center justify-center px-9">
       <header>
-        <h1 className="mb-3 text-3xl font-bold">
+        <h1 className="mb-3 text-lg font-semibold">
           <a href="#">Metronome</a>
         </h1>
       </header>
@@ -72,7 +72,7 @@ export function App() {
               }}
               className="bg-foreground/3 rounded text-center text-3xl font-bold"
             />
-            <span>BPM</span>
+            <span className="text-sm font-medium">BPM</span>
           </label>
 
           <div className="flex flex-wrap justify-center gap-2">
@@ -84,7 +84,7 @@ export function App() {
                   tempoBpm + delta < TEMPO_BPM_RANGE.min || tempoBpm + delta > TEMPO_BPM_RANGE.max
                 }
                 onClick={() => setTempoBpm(tempoBpm + delta)}
-                className={`${color} disabled:bg-foreground/3 disabled:text-foreground/50 cursor-pointer rounded px-4 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:active:translate-y-0 motion-safe:transition motion-safe:active:translate-y-px`}
+                className={`${color} disabled:bg-foreground/3 disabled:text-foreground/50 dark:disabled:bg-foreground/3 dark:disabled:text-foreground/50 cursor-pointer rounded px-4 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:active:translate-y-0 motion-safe:transition motion-safe:active:translate-y-px`}
               >
                 {delta > 0 ? `+${delta}` : delta}
               </button>
@@ -116,7 +116,7 @@ export function App() {
                 </option>
               ))}
             </select>
-            <span>Beats / Bar</span>
+            <span className="text-sm font-medium">Beats / Bar</span>
           </label>
 
           <div className="mb-3 flex gap-6">{beatIndicators}</div>
