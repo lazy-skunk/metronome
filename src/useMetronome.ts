@@ -6,7 +6,7 @@ import { MetronomeVisualScheduler } from "./MetronomeVisualScheduler";
 
 export const TEMPO_BPM_RANGE = {
   min: 30,
-  max: 240,
+  max: 300,
 } as const;
 
 const MIN_BEATS_PER_BAR = 1;
