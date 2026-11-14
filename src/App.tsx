@@ -1,7 +1,7 @@
 import { TEMPO_BPM_RANGE, useMetronome } from "./useMetronome";
-const BEATS_PER_BAR_OPTIONS = [2, 3, 4, 5, 6] as const;
+const BEATS_PER_BAR_OPTIONS = Array.from({ length: 12 }, (_, index) => index + 1);
 const DOWNBEAT_INDEX = 0;
-const TEMPO_COLOR_MIN_BPM = 120;
+const TEMPO_COLOR_MIN_BPM = 60;
 const TEMPO_COLOR_MAX_BPM = 240;
 const HSL_RED_HUE = 0;
 const HSL_GREEN_HUE = 120;
@@ -42,110 +42,124 @@ export function App() {
       beatColor = isDownbeat ? "bg-red-500" : "bg-green-500";
     }
 
-    return <div key={index} className={`h-3 w-3 rounded-full ${beatColor}`} />;
+    return (
+      <div
+        key={index}
+        className={`${beatColor} h-3 w-3 rounded-full motion-safe:transition-opacity motion-safe:starting:opacity-0`}
+      />
+    );
   });
 
   return (
-    <div className="bg-background text-foreground flex min-h-screen flex-col items-center justify-center px-9">
+    <div className="bg-background text-foreground flex min-h-screen flex-col items-center justify-center gap-6 p-6">
       <header>
-        <h1 className="mb-3 text-lg font-semibold">
+        <h1 className="text-lg font-bold">
           <a href="#">Metronome</a>
         </h1>
       </header>
 
-      <main className="bg-foreground/3 w-full max-w-xl rounded p-6">
-        <div className="flex flex-col items-center gap-3">
-          <label className="flex items-center gap-3">
-            <input
-              type="number"
-              min={TEMPO_BPM_RANGE.min}
-              max={TEMPO_BPM_RANGE.max}
-              value={tempoInputValue}
-              onChange={(event) => {
-                setTempoInputValue(event.target.value);
-              }}
-              onBlur={commitTempoInput}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") {
-                  event.currentTarget.blur();
-                }
-              }}
-              className="bg-foreground/3 rounded text-center text-3xl font-bold"
-            />
-            <span className="text-sm font-medium">BPM</span>
-          </label>
+      <main className="bg-foreground/3 flex w-full max-w-xl flex-col items-center gap-4 rounded p-4">
+        <div className="flex items-center gap-2">
+          <input
+            id="tempo-bpm"
+            type="number"
+            min={TEMPO_BPM_RANGE.min}
+            max={TEMPO_BPM_RANGE.max}
+            value={tempoInputValue}
+            onChange={(event) => {
+              setTempoInputValue(event.target.value);
+            }}
+            onBlur={commitTempoInput}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                event.currentTarget.blur();
+              }
+            }}
+            className="bg-foreground/3 hover:bg-foreground/6 rounded p-2 text-center text-3xl font-bold motion-safe:transition-colors"
+          />
+          <label htmlFor="tempo-bpm">BPM</label>
+        </div>
 
-          <div className="flex flex-wrap justify-center gap-2">
-            {TEMPO_ADJUSTMENTS.map(({ delta, color }) => (
-              <button
-                key={delta}
-                type="button"
-                disabled={
-                  tempoBpm + delta < TEMPO_BPM_RANGE.min || tempoBpm + delta > TEMPO_BPM_RANGE.max
-                }
-                onClick={() => setTempoBpm(tempoBpm + delta)}
-                className={`${color} disabled:bg-foreground/3 disabled:text-foreground/50 dark:disabled:bg-foreground/3 dark:disabled:text-foreground/50 cursor-pointer rounded px-4 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:active:translate-y-0 motion-safe:transition motion-safe:active:translate-y-px`}
-              >
-                {delta > 0 ? `+${delta}` : delta}
-              </button>
-            ))}
-          </div>
-
-          <label className="mb-3 w-full">
-            <span className="sr-only">BPM</span>
-            <input
-              type="range"
-              min={TEMPO_BPM_RANGE.min}
-              max={TEMPO_BPM_RANGE.max}
-              value={tempoBpm}
-              onChange={(event) => setTempoBpm(Number(event.target.value))}
-              className="w-full"
-              style={{ accentColor: tempoSliderAccentColor }}
-            />
-          </label>
-
-          <label className="flex items-center gap-3">
-            <select
-              value={beatsPerBar}
-              onChange={(event) => setBeatsPerBar(Number(event.target.value))}
-              className="bg-foreground/3 rounded px-6 text-3xl font-bold"
+        <div className="flex flex-wrap justify-center gap-2">
+          {TEMPO_ADJUSTMENTS.map(({ delta, color }) => (
+            <button
+              key={delta}
+              type="button"
+              disabled={
+                tempoBpm + delta < TEMPO_BPM_RANGE.min || tempoBpm + delta > TEMPO_BPM_RANGE.max
+              }
+              onClick={() => setTempoBpm(tempoBpm + delta)}
+              className={`${color} disabled:bg-foreground/3 disabled:text-foreground/50 dark:disabled:bg-foreground/3 dark:disabled:text-foreground/50 cursor-pointer rounded px-4 py-2 disabled:cursor-not-allowed disabled:active:translate-y-0 motion-safe:transition motion-safe:active:translate-y-px`}
             >
-              {BEATS_PER_BAR_OPTIONS.map((value) => (
-                <option key={value} value={value} className="bg-background text-foreground">
-                  {value}
-                </option>
-              ))}
-            </select>
-            <span className="text-sm font-medium">Beats / Bar</span>
+              {delta > 0 ? `+${delta}` : delta}
+            </button>
+          ))}
+        </div>
+
+        <div className="w-full">
+          <label htmlFor="tempo-slider" className="sr-only">
+            BPM
           </label>
+          <input
+            id="tempo-slider"
+            type="range"
+            min={TEMPO_BPM_RANGE.min}
+            max={TEMPO_BPM_RANGE.max}
+            value={tempoBpm}
+            onChange={(event) => setTempoBpm(Number(event.target.value))}
+            className="w-full"
+            style={{ accentColor: tempoSliderAccentColor }}
+          />
+        </div>
 
-          <div className="mb-3 flex gap-6">{beatIndicators}</div>
+        <div className="flex items-center gap-2">
+          <select
+            id="beats-per-bar"
+            value={beatsPerBar}
+            onChange={(event) => setBeatsPerBar(Number(event.target.value))}
+            className="bg-foreground/3 hover:bg-foreground/6 rounded p-2 motion-safe:transition-colors"
+          >
+            {BEATS_PER_BAR_OPTIONS.map((value) => (
+              <option key={value} value={value} className="bg-background text-foreground">
+                {value}
+              </option>
+            ))}
+          </select>
+          <label htmlFor="beats-per-bar">Beats / Bar</label>
+        </div>
 
-          {errorMessage && <div className="text-sm text-red-500">{errorMessage}</div>}
+        <div className="flex gap-2">{beatIndicators}</div>
 
-          <>
-            {status !== "running" && (
-              <button
-                type="button"
-                disabled={status === "starting"}
-                onClick={() => {
-                  void startPlayback();
-                }}
-                className="disabled:bg-foreground/3 disabled:text-foreground/50 dark:disabled:bg-foreground/3 dark:disabled:text-foreground/50 cursor-pointer rounded bg-green-100 px-4 py-2 text-sm font-medium text-green-900 disabled:cursor-not-allowed disabled:active:translate-y-0 motion-safe:transition motion-safe:active:translate-y-px dark:bg-green-900 dark:text-green-100"
-              >
-                {status === "starting" ? "Starting…" : "Start"}
-              </button>
-            )}
-            {status !== "idle" && (
-              <button
-                type="button"
-                onClick={stopPlayback}
-                className="cursor-pointer rounded bg-red-100 px-4 py-2 text-sm font-medium text-red-900 motion-safe:transition motion-safe:active:translate-y-px dark:bg-red-900 dark:text-red-100"
-              >
-                Stop
-              </button>
-            )}
-          </>
+        <div role="alert" className="empty:absolute">
+          {errorMessage && (
+            <div className="text-red-500 motion-safe:transition-opacity motion-safe:starting:opacity-0">
+              {errorMessage}
+            </div>
+          )}
+        </div>
+
+        <div className="flex flex-wrap justify-center gap-2">
+          {status !== "running" && (
+            <button
+              type="button"
+              disabled={status === "starting"}
+              onClick={() => {
+                void startPlayback();
+              }}
+              className="disabled:bg-foreground/3 disabled:text-foreground/50 dark:disabled:bg-foreground/3 dark:disabled:text-foreground/50 cursor-pointer rounded bg-green-100 px-4 py-2 text-green-900 disabled:cursor-not-allowed disabled:active:translate-y-0 motion-safe:transition motion-safe:active:translate-y-px dark:bg-green-900 dark:text-green-100"
+            >
+              {status === "starting" ? "Starting…" : "Start"}
+            </button>
+          )}
+          {status !== "idle" && (
+            <button
+              type="button"
+              onClick={stopPlayback}
+              className="cursor-pointer rounded bg-red-100 px-4 py-2 text-red-900 motion-safe:transition motion-safe:active:translate-y-px dark:bg-red-900 dark:text-red-100"
+            >
+              Stop
+            </button>
+          )}
         </div>
       </main>
     </div>
